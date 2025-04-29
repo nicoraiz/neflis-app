@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ver Película</title>
+  <link rel="icon" href="media/favicon.png" type="image/png">
+  <link rel="stylesheet" href="style-repro.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-logo">
+      <a href="index.html"><img src="media/neflis.png" alt="Neflis"/></a>
+    </div>
+    <div class="navbar-search-login">
+      <input type="text" style="font-family: 'Netflix Sans';" placeholder="Buscar...">
+    </div>
+  </nav>
+  </header>
+  <section class="video-player">
+    <video style="height: 100%; width: 100%;" 
+      id="reproductor"
+      poster="" 
+      autoplay 
+      controls 
+      controlsList="nodownload noremoteplayback" 
+      disablePictureInPicture 
+      oncontextmenu="return false;"
+    >
+      <source id="fuente" src="" type="video/mp4" />
+      Tu navegador no soporta el video.
+    </video>
+    <div class="player-info">
+      <h1 id="titulo">Cargando...</h1>
+      <p id="descripcion"></p>
+    </div>
+  </section>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const peliId = params.get('pelicula');
+    
+    const peliculas = {
+      interestelar: {
+        titulo: "Interestelar (2014)",
+        descripcion: "Una odisea espacial que trasciende el tiempo y el amor.",
+        video: "movies/Interestelar (2014) 1080P.mp4",
+        poster: "media/banner-de-interstellar-original.jpg"
+      },
+      coraline: {
+        titulo: "Coraline (2009)",
+        descripcion: "Una puerta secreta. Un mundo alternativo. Y un oscuro secreto.",
+        video: "movies/Coraline y la puerta secreta.mp4",
+        poster: "media/coraline-banner-2.jpg"
+      },
+      toystory4: {
+        titulo: "Toy Story 4 [2019]",
+        descripcion: "Una nueva aventura. Viejos amigos. Y un destino que nunca imaginaron.",
+        video: "movies/Toy Story 4 - Español.mp4",
+        poster: "media/toy-story-banner-4-version2.jpg"
+      },
+      flow: {
+        titulo: "Flow (2024)",
+        descripcion: "En un mundo sumergido, la supervivencia se escribe con patas, aletas y alas.",
+        video: "movies/Flow.2024.1080p.mkv",
+        poster: "media/flow-banner-2.jpg"
+      },
+      blancanieves1: {
+        titulo: "Blancanieves (1937)",
+        descripcion: "Un cuento eterno donde la belleza y la magia luchan contra la oscuridad.",
+        video: "movies/Flow.2024.1080p.mkv",
+        poster: "media/snow-white.jpg"
+      }
+    };
+    
+    const peli = peliculas[peliId];
+    const video = document.getElementById('reproductor');
+    
+    if (peli) {
+      video.src = peli.video;
+      video.poster = peli.poster;
+      document.getElementById('titulo').textContent = peli.titulo;
+      document.getElementById('descripcion').textContent = peli.descripcion;
+      video.load();
+    
+      // cargamos metadatos
+      video.addEventListener('loadedmetadata', () => {
+        const tiempoGuardado = localStorage.getItem(`tiempo-${peliId}`);
+        if (tiempoGuardado) {
+          video.currentTime = parseFloat(tiempoGuardado);
+        }
+      });
+    
+      // escuchar cuando el video esté en play para empezar a guardar
+      video.addEventListener('play', () => {
+        setInterval(() => {
+          if (!video.paused && !video.ended) {
+            if (video.duration - video.currentTime > 5) {
+              localStorage.setItem(`tiempo-${peliId}`, video.currentTime);
+            } else {
+              localStorage.removeItem(`tiempo-${peliId}`);
+            }
+          }
+        }, 1000); // guarda cada segundo
+      });
+    
+    } else {
+      document.body.innerHTML = '<h2 style="color:white; text-align:center;">Película no encontrada.</h2>';
+    }
+    </script>     
+  <footer>
+    <img style="display: block; margin-left: auto; margin-right: auto; width: 10%;" src="media/neflis 3d.png">
+    <p>&copy; 2025 Neflis. Todos los derechos reservados.</p>
+    <p>
+      <a style="color: red; text-decoration: none;" href="#">Política de privacidad</a> | 
+      <a style="color: red; text-decoration: none;" href="#">Términos y condiciones</a>
+    </p>
+  </footer>
+</body>
+</html>
